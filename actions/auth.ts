@@ -5,32 +5,27 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
 export async function login(formData: FormData) {
-  try {
-    const supabase = await createClient()
+  const supabase = await createClient()
 
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
+  const email = formData.get('email') as string
+  const password = formData.get('password') as string
 
-    if (!email || !password) {
-      return { error: 'Email and password are required' }
-    }
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-
-    if (error) {
-      console.error('Login error:', error)
-      return { error: error.message }
-    }
-
-    revalidatePath('/', 'layout')
-    redirect('/dashboard')
-  } catch (error) {
-    console.error('Login action error:', error)
-    return { error: 'An unexpected error occurred' }
+  if (!email || !password) {
+    return { error: 'Email and password are required' }
   }
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  })
+
+  if (error) {
+    console.error('Login error:', error)
+    return { error: error.message }
+  }
+
+  revalidatePath('/', 'layout')
+  redirect('/dashboard')
 }
 
 export async function register(formData: FormData) {
@@ -72,15 +67,10 @@ export async function register(formData: FormData) {
 }
 
 export async function logout() {
-  try {
-    const supabase = await createClient()
-    
-    await supabase.auth.signOut()
-    
-    revalidatePath('/', 'layout')
-    redirect('/login')
-  } catch (error) {
-    console.error('Logout error:', error)
-    redirect('/login')
-  }
+  const supabase = await createClient()
+  
+  await supabase.auth.signOut()
+  
+  revalidatePath('/', 'layout')
+  redirect('/login')
 }
