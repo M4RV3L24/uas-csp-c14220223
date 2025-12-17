@@ -47,15 +47,19 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
-  if (
-    request.nextUrl.pathname !== "/" &&
-    !user &&
-    !request.nextUrl.pathname.startsWith("/login") &&
-    !request.nextUrl.pathname.startsWith("/auth")
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
+  const { pathname } = request.nextUrl;
+
+  // If user is not logged in and trying to access dashboard, redirect to login
+  if (!user && pathname === '/dashboard') {
     const url = request.nextUrl.clone();
-    url.pathname = "/auth/login";
+    url.pathname = '/login';
+    return NextResponse.redirect(url);
+  }
+
+  // If user is logged in and trying to access login or register, redirect to dashboard
+  if (user && (pathname === '/login' || pathname === '/register')) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/dashboard';
     return NextResponse.redirect(url);
   }
 
