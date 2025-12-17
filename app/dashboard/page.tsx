@@ -3,8 +3,9 @@ import { redirect } from 'next/navigation'
 import { logout } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Suspense } from 'react'
 
-export default async function DashboardPage() {
+async function DashboardContent() {
   const supabase = await createClient()
 
   const { data: { user }, error } = await supabase.auth.getUser()
@@ -78,5 +79,35 @@ export default async function DashboardPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+function LoadingDashboard() {
+  return (
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-300 rounded w-1/3 mb-4"></div>
+          <div className="h-4 bg-gray-300 rounded w-1/4 mb-8"></div>
+          <div className="grid gap-6">
+            <div className="bg-white p-6 rounded-lg shadow">
+              <div className="h-6 bg-gray-300 rounded w-1/4 mb-4"></div>
+              <div className="space-y-2">
+                <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<LoadingDashboard />}>
+      <DashboardContent />
+    </Suspense>
   )
 }

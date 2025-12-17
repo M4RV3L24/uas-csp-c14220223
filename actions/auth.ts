@@ -54,7 +54,12 @@ export async function register(formData: FormData) {
       return { error: error.message }
     }
 
-    // Check if email confirmation is required
+    // Check if user already exists by looking at identities
+    if (data.user && data.user.identities && data.user.identities.length === 0) {
+      return { error: 'User with this email already exists. Please login instead.' }
+    }
+
+    // Check if user was created but no session (email confirmation required)
     if (data.user && !data.session) {
       return { success: 'Registration successful! Please check your email to confirm your account, then login.' }
     }
